@@ -98,3 +98,9 @@ app.post('/gunceltc', (req, res) => {
 // içindeki public kelimesi değişebilir
 app.use(express.static('public'))
 app.listen(port, () => console.log('port çalışıyor'))
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Sunucu ${PORT} portunda çalışıyor`);
+});
