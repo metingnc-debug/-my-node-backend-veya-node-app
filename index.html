@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<script src="jquery-3.6.0.js"></script>
+<html lang="tr">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Öğrenci Kayıt Sistemi</title>
+    <!-- CDN Üzerinden Güvenli ve Kesin Çalışan jQuery Bağlantısı -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <style>
     #divim {
         width: 200px;
-        
         border-style: solid;
         border-width: 1px 0 1px 1px;
         border-color: black;
@@ -24,7 +23,6 @@
 
     #divim2 {
         width: 200px;
-        
         border: solid 1px black;
         list-style-type: none;
         text-align: center;
@@ -34,8 +32,6 @@
 
     li:nth-child(even) {
         background-color: #ccc;
-
-
     }
 
     #panel {
@@ -46,20 +42,11 @@
     }
 
     #mesaj {
-
         width: 400px;
         display: flex;
     }
 
-    #isim {
-        width: 98%;
-        height: 25px;
-        border: none;
-        border-bottom: solid 1px black;
-        outline: 0;
-    }
-
-    #soyisim {
+    #isim, #soyisim, #tcno {
         width: 98%;
         height: 25px;
         border: none;
@@ -68,21 +55,16 @@
     }
 
     #tcno {
-        width: 98%;
-        height: 25px;
-        border: none;
-        border-bottom: solid 1px black;
         margin-bottom: 10px;
-        outline: 0;
     }
 
     #btn {
         width: 100%;
         height: 35px;
-font-size: 20px;
-background-color: #630b0b;
-color: white;
-cursor: pointer;
+        font-size: 20px;
+        background-color: #630b0b;
+        color: white;
+        cursor: pointer;
     }
 
     .th1 {
@@ -91,7 +73,7 @@ cursor: pointer;
         color: white;
     }
 
-    .th2{
+    .th2 {
         width: 200px;
         background-color: rgb(85, 108, 67);
         color: white;
@@ -105,8 +87,8 @@ cursor: pointer;
         <input type="text" id="soyisim" placeholder="Soyisim">
         <input type="text" id="tcno" placeholder="TC no">
         <button id="btn">Kaydet</button>
-
     </div>
+    <br>
     <input type="text" id="yeniisim" placeholder="yeni isim girin">
     <input type="text" id="risim" placeholder="güncellenecek isimi girin">
     <button id="guncelbtn">İsim Güncelle</button><br>
@@ -118,6 +100,7 @@ cursor: pointer;
     <input type="text" id="yenitc" placeholder="yeni Tc girin">
     <input type="text" id="tcisim" placeholder="TCsi değişecek ismi gir">
     <button id="gunceltbtn">Tc Güncelle</button><br>
+
     <table width="400" height="20" cellspacing="0" border="1">
         <tr>
             <th class="th1">Adı Soyadı</th>
@@ -130,163 +113,118 @@ cursor: pointer;
     </div>
 
     <script>
+        function verileriGetir() {
+            $.post("/ogrenciVerisi", function (data) {
+                var result = "";
+                var result2 = "";
+                if (data && data.length > 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        result += '<li>' + data[i].isim + " " + data[i].soyisim + '</li>';
+                        result2 += '<li>' + data[i].tcno + '</li>';
+                    }
+                    document.getElementById('divim').innerHTML = result;
+                    document.getElementById('divim2').innerHTML = result2;
+                }
+            });
+        }
+
+        // Sayfa yüklendiğinde verileri çek
+        $(document).ready(function () {
+            verileriGetir();
+        });
 
         $('#btn').click(function () {
             if ($('#isim').val() == "") {
-                alert('isim boş bırakılamaz')
+                alert('isim boş bırakılamaz');
                 return false;
             }
             if ($('#soyisim').val() == "") {
-                alert('soyisim boş bırakılamaz')
+                alert('soyisim boş bırakılamaz');
                 return false;
             }
             if ($('#tcno').val() == "") {
-                alert('tcno boş bırakılamaz')
+                alert('tcno boş bırakılamaz');
                 return false;
             }
-            $.ajax({
 
+            $.ajax({
                 type: "POST",
                 url: "/verigirisi",
-                // json olarak gönderebilmek için
-                // JSON.stringify() içine yazılmalı
                 data: JSON.stringify({
                     "isim": $('#isim').val(),
                     "soyisim": $('#soyisim').val(),
-                    "tcno": $('#tcno').val(),
-
+                    "tcno": $('#tcno').val()
                 }),
                 contentType: "application/json",
                 dataType: "json",
                 success: function (response) {
-                    
+                    $('#isim').val('');
+                    $('#soyisim').val('');
+                    $('#tcno').val('');
+                    verileriGetir();
                 },
                 error: function (err) {
                     alert('bir şeyler ters gitti');
-
                 }
-
-            })
-
-
-
-
-            setTimeout(function () {
-
-                $.post("/ogrenciVerisi", function (data) {
-                    var result = "";
-                    var result2 = ""
-                    for (var i = 0; i < data.length; i++) {
-                        result += '<li>' + data[i].isim + " " + data[i].soyisim + '</li>'
-
-                        divim.innerHTML = result;
-
-                    }
-                    for (var j = 0; j < data.length; j++) {
-                        result2 += '<li>' + data[j].tcno + '</li>'
-
-                    }
-                    divim2.innerHTML = result2
-                });
-            }, 100)
-
-        })
-        //sayfayı ilk açtığında verileri hemen çekmek için......
-        $.post("/ogrenciVerisi", function (data) {
-            var result = "";
-            var result2 = ""
-            for (var i = 0; i < data.length; i++) {
-                result += '<li>' + data[i].isim + " " + data[i].soyisim + '</li>'
-
-                divim.innerHTML = result;
-
-            }
-            for (var j = 0; j < data.length; j++) {
-                result2 += '<li>' + data[j].tcno + '</li>'
-
-            }
-            divim2.innerHTML = result2
+            });
         });
 
-        //GÜNCELLEME SATIRI
-        $('#guncelbtn').click(function () {//isim güncelleme
+        $('#guncelbtn').click(function () {
             $.ajax({
                 type: "POST",
                 url: "/guncel",
                 data: JSON.stringify({
                     "yeniisim": $('#yeniisim').val(),
-                    "risim": $('#risim').val(),
-
-
+                    "risim": $('#risim').val()
                 }),
                 contentType: "application/json",
                 dataType: "json",
                 success: function (response) {
-                    console.log('basarılı');
-                  
+                    window.location.reload();
                 },
                 error: function (err) {
                     alert('bir şeyler ters gitti');
-
                 }
+            });
+        });
 
-            })
-
-            window.location.reload();
-        })
-
-
-
-
-        $('#guncelsbtn').click(function () {//soyisim güncelleme
+        $('#guncelsbtn').click(function () {
             $.ajax({
                 type: "POST",
                 url: "/guncelsoyisim",
                 data: JSON.stringify({
                     "yenisoyisim": $('#yenisoyisim').val(),
-                    "isimg": $('#isimg').val(),
-
-
+                    "isimg": $('#isimg').val()
                 }),
                 contentType: "application/json",
                 dataType: "json",
                 success: function (response) {
-                    console.log('basarılı');
-
+                    window.location.reload();
                 },
                 error: function (err) {
                     alert('bir şeyler ters gitti');
-
                 }
+            });
+        });
 
-            })
-            window.location.reload();
-        })
-
-        $('#gunceltbtn').click(function () {//tc güncelleme
+        $('#gunceltbtn').click(function () {
             $.ajax({
                 type: "POST",
                 url: "/gunceltc",
                 data: JSON.stringify({
                     "yenitc": $('#yenitc').val(),
-                    "tcisim": $('#tcisim').val(),
-
-
+                    "tcisim": $('#tcisim').val()
                 }),
                 contentType: "application/json",
                 dataType: "json",
                 success: function (response) {
-                    console.log('basarılı');
-
+                    window.location.reload();
                 },
                 error: function (err) {
                     alert('bir şeyler ters gitti');
-
                 }
-
-            })
-            window.location.reload();
-        })
+            });
+        });
     </script>
 </body>
 
