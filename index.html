@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script src="jquery-3.6.0.js"></script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    #divim {
+        width: 200px;
+        
+        border-style: solid;
+        border-width: 1px 0 1px 1px;
+        border-color: black;
+        list-style-type: none;
+        text-align: center;
+        margin-top: 5px;
+        background-color: rgba(214, 189, 126, 0.589);
+    }
+
+    #divim2 {
+        width: 200px;
+        
+        border: solid 1px black;
+        list-style-type: none;
+        text-align: center;
+        margin-top: 5px;
+        background-color: rgba(214, 189, 126, 0.589);
+    }
+
+    li:nth-child(even) {
+        background-color: #ccc;
+
+
+    }
+
+    #panel {
+        width: 400px;
+        height: 150px;
+        border: solid 1px #ccc;
+        border-radius: 8px;
+    }
+
+    #mesaj {
+
+        width: 400px;
+        display: flex;
+    }
+
+    #isim {
+        width: 98%;
+        height: 25px;
+        border: none;
+        border-bottom: solid 1px black;
+        outline: 0;
+    }
+
+    #soyisim {
+        width: 98%;
+        height: 25px;
+        border: none;
+        border-bottom: solid 1px black;
+        outline: 0;
+    }
+
+    #tcno {
+        width: 98%;
+        height: 25px;
+        border: none;
+        border-bottom: solid 1px black;
+        margin-bottom: 10px;
+        outline: 0;
+    }
+
+    #btn {
+        width: 100%;
+        height: 35px;
+font-size: 20px;
+background-color: #630b0b;
+color: white;
+cursor: pointer;
+    }
+
+    .th1 {
+        width: 200px;
+        background-color: rgb(122, 122, 216);
+        color: white;
+    }
+
+    .th2{
+        width: 200px;
+        background-color: rgb(85, 108, 67);
+        color: white;
+    }
+</style>
+
+<body>
+
+    <div id="panel">
+        <input type="text" id="isim" placeholder="İsim" autocomplete="off">
+        <input type="text" id="soyisim" placeholder="Soyisim">
+        <input type="text" id="tcno" placeholder="TC no">
+        <button id="btn">Kaydet</button>
+
+    </div>
+    <input type="text" id="yeniisim" placeholder="yeni isim girin">
+    <input type="text" id="risim" placeholder="güncellenecek isimi girin">
+    <button id="guncelbtn">İsim Güncelle</button><br>
+
+    <input type="text" id="yenisoyisim" placeholder="yeni soyisim girin">
+    <input type="text" id="isimg" placeholder="soyadı değişecek isimi gir">
+    <button id="guncelsbtn">Soyisim Güncelle</button><br>
+
+    <input type="text" id="yenitc" placeholder="yeni Tc girin">
+    <input type="text" id="tcisim" placeholder="TCsi değişecek ismi gir">
+    <button id="gunceltbtn">Tc Güncelle</button><br>
+    <table width="400" height="20" cellspacing="0" border="1">
+        <tr>
+            <th class="th1">Adı Soyadı</th>
+            <th class="th2">Tc No</th>
+        </tr>
+    </table>
+    <div id="mesaj">
+        <div id="divim"></div>
+        <div id="divim2"></div>
+    </div>
+
+    <script>
+
+        $('#btn').click(function () {
+            if ($('#isim').val() == "") {
+                alert('isim boş bırakılamaz')
+                return false;
+            }
+            if ($('#soyisim').val() == "") {
+                alert('soyisim boş bırakılamaz')
+                return false;
+            }
+            if ($('#tcno').val() == "") {
+                alert('tcno boş bırakılamaz')
+                return false;
+            }
+            $.ajax({
+
+                type: "POST",
+                url: "/verigirisi",
+                // json olarak gönderebilmek için
+                // JSON.stringify() içine yazılmalı
+                data: JSON.stringify({
+                    "isim": $('#isim').val(),
+                    "soyisim": $('#soyisim').val(),
+                    "tcno": $('#tcno').val(),
+
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                success: function (response) {
+                    
+                },
+                error: function (err) {
+                    alert('bir şeyler ters gitti');
+
+                }
+
+            })
+
+
+
+
+            setTimeout(function () {
+
+                $.post("/ogrenciVerisi", function (data) {
+                    var result = "";
+                    var result2 = ""
+                    for (var i = 0; i < data.length; i++) {
+                        result += '<li>' + data[i].isim + " " + data[i].soyisim + '</li>'
+
+                        divim.innerHTML = result;
+
+                    }
+                    for (var j = 0; j < data.length; j++) {
+                        result2 += '<li>' + data[j].tcno + '</li>'
+
+                    }
+                    divim2.innerHTML = result2
+                });
+            }, 100)
+
+        })
+        //sayfayı ilk açtığında verileri hemen çekmek için......
+        $.post("/ogrenciVerisi", function (data) {
+            var result = "";
+            var result2 = ""
+            for (var i = 0; i < data.length; i++) {
+                result += '<li>' + data[i].isim + " " + data[i].soyisim + '</li>'
+
+                divim.innerHTML = result;
+
+            }
+            for (var j = 0; j < data.length; j++) {
+                result2 += '<li>' + data[j].tcno + '</li>'
+
+            }
+            divim2.innerHTML = result2
+        });
+
+        //GÜNCELLEME SATIRI
+        $('#guncelbtn').click(function () {//isim güncelleme
+            $.ajax({
+                type: "POST",
+                url: "/guncel",
+                data: JSON.stringify({
+                    "yeniisim": $('#yeniisim').val(),
+                    "risim": $('#risim').val(),
+
+
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                success: function (response) {
+                    console.log('basarılı');
+                  
+                },
+                error: function (err) {
+                    alert('bir şeyler ters gitti');
+
+                }
+
+            })
+
+            window.location.reload();
+        })
+
+
+
+
+        $('#guncelsbtn').click(function () {//soyisim güncelleme
+            $.ajax({
+                type: "POST",
+                url: "/guncelsoyisim",
+                data: JSON.stringify({
+                    "yenisoyisim": $('#yenisoyisim').val(),
+                    "isimg": $('#isimg').val(),
+
+
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                success: function (response) {
+                    console.log('basarılı');
+
+                },
+                error: function (err) {
+                    alert('bir şeyler ters gitti');
+
+                }
+
+            })
+            window.location.reload();
+        })
+
+        $('#gunceltbtn').click(function () {//tc güncelleme
+            $.ajax({
+                type: "POST",
+                url: "/gunceltc",
+                data: JSON.stringify({
+                    "yenitc": $('#yenitc').val(),
+                    "tcisim": $('#tcisim').val(),
+
+
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                success: function (response) {
+                    console.log('basarılı');
+
+                },
+                error: function (err) {
+                    alert('bir şeyler ters gitti');
+
+                }
+
+            })
+            window.location.reload();
+        })
+    </script>
+</body>
+
+</html>

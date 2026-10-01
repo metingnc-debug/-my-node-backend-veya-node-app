@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script src="jquery-3.6.0.js"></script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    #divim {
+        width: 350px;
+        height: 450px;
+        border: solid 1px black;
+        list-style-type: none;
+        border-radius: 8px;
+    }
+
+    li:nth-child(even) {
+        background-color: #ccc;
+
+
+    }
+
+    #panel {
+        width: 350px;
+        height: 150px;
+        border: solid 1px #ccc;
+        border-radius: 8px;
+    }
+
+    #isim {
+        width: 98%;
+        height: 25px;
+        border: none;
+        border-bottom: solid 1px black;
+        outline: 0;
+    }
+
+    #soyisim {
+        width: 98%;
+        height: 25px;
+        border: none;
+        border-bottom: solid 1px black;
+        outline: 0;
+    }
+
+    #tcno {
+        width: 98%;
+        height: 25px;
+        border: none;
+        border-bottom: solid 1px black;
+        margin-bottom: 10px;
+        outline: 0;
+    }
+
+    #btn {
+        width: 100%;
+        height: 35px;
+
+    }
+</style>
+
+<body>
+
+    <div id="panel">
+        <input type="text" id="isim" placeholder="isim" autocomplete="off">
+        <input type="text" id="soyisim" placeholder="soyisim">
+        <input type="text" id="tcno" placeholder="tc no">
+        <button id="btn">Kaydet</button>
+    </div>
+
+
+    <div id="mesaj"></div>
+    <div id="divim">
+    </div>
+    <script>
+
+        $('#btn').click(function () {
+            if ($('#isim').val() == "") {
+                alert('isim boş bırakılamaz')
+                return false;
+            }
+            if ($('#soyisim').val() == "") {
+                alert('soyisim boş bırakılamaz')
+                return false;
+            }
+            if ($('#tcno').val() == "") {
+                alert('tcno boş bırakılamaz')
+                return false;
+            }
+            $.ajax({
+
+                type: "POST",
+                url: "/verigirisi",
+                // json olarak gönderebilmek için
+                // JSON.stringify() içine yazılmalı
+                data: JSON.stringify({
+                    "isim": $('#isim').val(),
+                    "soyisim": $('#soyisim').val(),
+                    "tcno": $('#tcno').val(),
+
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                success: function (response) {
+                    console.log('basarılı');
+                    isim.value = ""
+                    soyisim.value = ""
+                    tcno.value = ""
+                },
+                error: function (err) {
+                    alert('bir şeyler ters gitti');
+
+                }
+
+            })
+        })
+
+
+
+
+        setInterval(function () {
+            $.post("/ogrenciVerisi", function (data) {
+                var result = "";
+
+                for (var i = 0; i < data.length; i++) {
+                    result += '<li>' + data[i].isim + " " + data[i].soyisim + " " + '<font color=red>' + data[i].tcno + '</font>' + '</li>'
+                    divim.innerHTML = result;
+                }
+
+            });
+        }, 5000)
+    </script>
+</body>
+
+</html>
