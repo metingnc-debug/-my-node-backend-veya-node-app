@@ -7,13 +7,20 @@ const mysql = require('mysql2');
 
 app.use(bodyParser.json());
 
-var baglanti = mysql.createConnection({
+var baglanti = mysql.createPool({
     host: "bzdmmagvxnfc4n3xmhiv-mysql.services.clever-cloud.com",
-    user: "upiduggqxxexuuuh",
+    user: "upiduggqxexuuuh",
     password: "QohHZEVGgTr6heHZ3NLM",
     database: "bzdmmagvxnfc4n3xmhiv",
-    port: 3306
-});
+    port: 3306,
+    ssl: {
+      rejectUnauthorized: false
+    },
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  });
+  
 
 baglanti.connect(function (err) {
     if (err) throw err;
